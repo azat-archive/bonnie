@@ -1,0 +1,16 @@
+*.[ao]
+
+*.patch.*
+*.patched.*
+
+Makefile*
+config.*
+
+/bonnie++
+/bon_csv2html
+/bon_csv2txt
+/getc_putc_helper
+/getc_putc
+/generate_randfile
+/zcav
+
