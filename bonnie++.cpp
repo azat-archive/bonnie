@@ -541,6 +541,9 @@ TestFileOps(int file_size, CGlobalItems &globals)
     num_chunks = Unit / globals.io_chunk_size() * file_size;
     int char_io_chunks = Unit / globals.io_chunk_size() * globals.byte_io_size;
 
+    int bytes_aligned = 1 << 9;
+    if(globals.use_direct_io) char_io_chunks /= bytes_aligned;
+
     int rc;
     rc = file.Open(globals.name, true);
     if(rc)
@@ -550,16 +553,20 @@ TestFileOps(int file_size, CGlobalItems &globals)
     Duration dur;
 
     globals.timer.start();
+
     if(char_io_chunks)
     {
       dur.reset();
       globals.decrement_and_wait(ByteWrite);
       // Fill up a file, writing it a char at a time
-      if(!globals.quiet) fprintf(stderr, "Writing a byte at a time...");
+      if(!globals.use_direct_io && !globals.quiet) fprintf(stderr, "Writing a byte at a time...");
+      if(globals.use_direct_io && !globals.quiet) fprintf(stderr, "Writing %i bytes at a time...", bytes_aligned);
       for(words = 0; words < char_io_chunks; words++)
       {
         dur.start();
-        if(file.write_block_byte() == -1)
+        if(!globals.use_direct_io && file.write_block_byte() == -1)
+          return 1;
+        if(globals.use_direct_io && file.write_block_byte(bytes_aligned) == -1)
           return 1;
         dur.stop();
         if(exitNow)

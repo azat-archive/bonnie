@@ -17,7 +17,7 @@ public:
          );
   int Open(CPCCHAR base_name, bool create);
   ~CFileOp();
-  int write_block_byte();
+  int write_block_byte(int bytes = 1);
   int write_block(PVOID buf);
   int read_block_byte(char *buf);
   int read_block(PVOID buf);

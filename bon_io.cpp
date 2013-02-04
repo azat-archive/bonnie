@@ -219,12 +219,16 @@ int CFileOp::write_block(PVOID buf)
   return rc;
 }
 
-int CFileOp::write_block_byte()
+int CFileOp::write_block_byte(int bytes)
 {
+  char c[bytes];
   for(int i = 0; i < m_chunk_size; i++)
   {
-    char c = i & 0x7f;
-    if(write(m_fd, &c, 1) != 1)
+    for(int j = 0; j < bytes; j++)
+    {
+      c[j] = i & 0x7f;
+    }
+    if(write(m_fd, c, bytes) != bytes)
     {
       fprintf(stderr, "Can't write() - disk full?\n");
       return -1;
